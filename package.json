@@ -1,0 +1,15 @@
+{
+  "name": "proyecto-aemet",
+  "version": "1.0.0",
+  "description": "Extracción de datos meteorológicos AEMET a MySQL",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Jaime Fano Alijarde",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "mysql2": "^3.24.6"
+  }
+}
