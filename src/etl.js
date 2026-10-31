@@ -1,5 +1,5 @@
 // Author: Jaime Fano Alijarde
-// Descripcion: 
+// Descripcion: Orquesta la extracción, transformación e inserción de datos para todas las ciudades.
 const pool           = require('./pool');
 const { fetchLecturas } = require('./aemet');
 const { parseLectura }  = require('./parser');

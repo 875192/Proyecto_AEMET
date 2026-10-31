@@ -1,6 +1,5 @@
 // Author: Jaime Fano Alijarde
-// Descripcion: Convierte un valor numérico que AEMET devuelve como string con coma decimal.
-// Devuelve null si el valor está ausente.
+// Descripcion: Transforma la respuesta cruda de AEMET al formato del schema de base de datos.
 function parseNum(val) {
   if (val === undefined || val === null || val === '') return null;
   return parseFloat(String(val).replace(',', '.'));

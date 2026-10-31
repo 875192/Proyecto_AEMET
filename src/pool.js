@@ -1,5 +1,5 @@
 // Author: Jaime Fano Alijarde
-// Descripcion: 
+// Descripcion: Pool de conexiones MySQL reutilizable para toda la aplicación.
 const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({

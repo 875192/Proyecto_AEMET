@@ -1,5 +1,5 @@
 // Author: Jaime Fano Alijarde
-// Descripcion: 
+// Descripcion: Cliente HTTP para la API REST de AEMET OpenData (valores climatológicos diarios).
 const BASE_URL = 'https://opendata.aemet.es/opendata';
 
 // Obtiene las lecturas diarias de una estación entre dos fechas (YYYY-MM-DD).
