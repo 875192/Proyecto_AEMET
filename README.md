@@ -1,8 +1,8 @@
 # Proyecto AEMET — Extracción de datos meteorológicos a MySQL
 
-**Autor:** Jaime (875192@unizar.es) — Universidad de Zaragoza  
+**Autor:** Jaime Fano Alijarde ([jaimefano10@gmail.com](mailto:875192@unizar.es)) — Universidad de Zaragoza  
 **Fecha de creación:** Octubre 2026  
-**Asignatura:** Sistemas de Información · Práctica de investigación (Año 2)
+**Asignatura:** Sistemas de Información · Práctica de investigación 
 
 ---
 

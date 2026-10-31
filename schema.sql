@@ -1,5 +1,6 @@
 -- =====================================================================
 -- Práctica de investigación: datos meteorológicos AEMET -> MySQL
+-- Author: Jaime Fano Alijarde
 -- Esquema (fase 1): campos mínimos del enunciado + "otros datos".
 -- NOTA: las columnas extra se basan en el formato del endpoint de valores
 -- climatológicos diarios de AEMET (tmed, velmedia, racha, sol, presMax,
