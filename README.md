@@ -29,9 +29,16 @@ Temperatura máxima, mínima y media · Precipitación · Velocidad media y rach
 ## Estructura del repositorio
 
 ```
-├── schema.sql           # Esquema de la base de datos (tablas ciudades + lecturas_diarias)
-├── docker-compose.yml   # MySQL 8.4 + phpMyAdmin en Docker
-├── .env.example         # Variables de entorno necesarias (copiar a .env y ajustar)
+├── src/
+│   ├── pool.js              # Pool de conexiones MySQL reutilizable para toda la aplicación
+│   ├── aemet.js             # Cliente HTTP para la API REST de AEMET OpenData
+│   ├── parser.js            # Transforma la respuesta cruda de AEMET al formato del schema
+│   └── etl.js               # Orquesta la extracción, transformación e inserción de datos
+├── index.js                 # Punto de entrada: carga .env, define rango de fechas y arranca el ETL
+├── schema.sql               # Esquema de la base de datos (tablas ciudades + lecturas_diarias)
+├── docker-compose.yml       # MySQL 8.4 + phpMyAdmin en Docker
+├── package.json             # Dependencias Node.js (mysql2, dotenv)
+├── .env.example             # Variables de entorno necesarias (copiar a .env y ajustar)
 └── notas-practica-aemet.md  # Notas internas de desarrollo y decisiones tomadas
 ```
 
