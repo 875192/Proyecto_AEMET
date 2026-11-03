@@ -24,7 +24,9 @@ Este proyecto es la **fase 1** de una práctica en dos partes; la fase 2 constru
 
 ## Datos recogidos por ciudad y día
 
-Temperatura máxima, mínima y media · Precipitación · Velocidad media y racha máxima del viento · Horas de sol · Presión máxima y mínima.
+Temperatura máxima, mínima y media · Precipitación · Velocidad media, racha máxima y dirección del viento · Humedad relativa media, máxima y mínima · Horas de sol · Presión máxima y mínima. Además se guarda la altitud de cada estación.
+
+> No todas las estaciones miden todas las variables (p. ej. Madrid y Barcelona no informan de horas de sol, y Barcelona tampoco de presión), por lo que esas columnas pueden ser `NULL`. AEMET publica los valores diarios con unos días de retraso.
 
 ## Estructura del repositorio
 
@@ -36,6 +38,7 @@ Temperatura máxima, mínima y media · Precipitación · Velocidad media y rach
 │   └── etl.js               # Orquesta la extracción, transformación e inserción de datos
 ├── index.js                 # Punto de entrada: carga .env, define rango de fechas y arranca el ETL
 ├── schema.sql               # Esquema de la base de datos (tablas ciudades + lecturas_diarias)
+├── datos_aemet.sql          # Volcado completo (estructura + datos ya cargados) para importar tal cual
 ├── docker-compose.yml       # MySQL 8.4 + phpMyAdmin en Docker
 ├── package.json             # Dependencias Node.js (mysql2, dotenv)
 ├── .env.example             # Variables de entorno necesarias (copiar a .env y ajustar)
@@ -63,7 +66,28 @@ cp .env.example .env
 docker compose up -d
 # MySQL disponible en localhost:3306
 # phpMyAdmin disponible en http://localhost:8080
+
+# 4. Instalar dependencias y lanzar la extracción
+npm install
+npm start        # equivale a: node index.js
 ```
 
+Por defecto se descargan los **últimos 30 días**. Para otro rango, define `FECHA_INI` y `FECHA_FIN` (`YYYY-MM-DD`) en el `.env`. El script se puede relanzar sin duplicar datos (`UNIQUE(id_ciudad, fecha)` + `ON DUPLICATE KEY UPDATE`).
+
 > El archivo `schema.sql` se ejecuta automáticamente la primera vez que se crea el volumen.  
-> Para reiniciar desde cero: `docker compose down -v && docker compose up -d`
+> Para reiniciar desde cero: `docker compose down -v && docker compose up -d`  
+> Las variables `DB_*` del `.env` deben coincidir con las `MYSQL_*`. Si cambias una contraseña con la base ya creada, MySQL no la actualiza: recrea el volumen como indica arriba.
+
+## Importar el volcado de datos (sin usar la API)
+
+Para obtener la base de datos con los datos ya cargados, sin API key:
+
+```bash
+docker exec -i meteo_mysql mysql -umeteo -p meteo_aemet < datos_aemet.sql
+```
+
+o bien con la pestaña **Importar** de phpMyAdmin. Si cargas nuevos datos con el ETL, regenera el volcado:
+
+```bash
+docker exec meteo_mysql mysqldump -umeteo -p --no-tablespaces --databases meteo_aemet > datos_aemet.sql
+```
