@@ -1,5 +1,6 @@
 # MySQL + phpMyAdmin para la práctica AEMET.
 # Uso:  docker compose up -d
+# Author: Jaime Fano Alijarde
 # Requiere un archivo .env (copia .env.example y ajusta las contraseñas).
 
 services:

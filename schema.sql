@@ -2,9 +2,11 @@
 -- Práctica de investigación: datos meteorológicos AEMET -> MySQL
 -- Author: Jaime Fano Alijarde
 -- Esquema (fase 1): campos mínimos del enunciado + "otros datos".
--- NOTA: las columnas extra se basan en el formato del endpoint de valores
--- climatológicos diarios de AEMET (tmed, velmedia, racha, sol, presMax,
--- presMin). Verificar contra la primera respuesta real de la API.
+-- NOTA: las columnas extra corresponden a campos del endpoint de valores
+-- climatológicos diarios de AEMET (tmed, velmedia, racha, dir, sol, presMax,
+-- presMin, hrMedia, hrMax, hrMin), verificados contra respuestas reales.
+-- Todas las medidas admiten NULL: no todas las estaciones miden todo
+-- (p. ej. Madrid y Barcelona no informan de sol; Barcelona tampoco de presión).
 -- =====================================================================
 
 CREATE DATABASE IF NOT EXISTS meteo_aemet
@@ -20,6 +22,7 @@ CREATE TABLE IF NOT EXISTS ciudades (
   id_ciudad   INT UNSIGNED NOT NULL AUTO_INCREMENT,
   nombre      VARCHAR(100) NOT NULL,   -- p. ej. "Zaragoza"
   indicativo  VARCHAR(10)  NOT NULL,   -- idema de AEMET (puede llevar letras: "0201D")
+  altitud     SMALLINT     NULL,       -- m sobre el nivel del mar (altitud de la estación, la rellena el ETL)
   PRIMARY KEY (id_ciudad),
   UNIQUE KEY uq_ciudades_indicativo (indicativo)
 ) ENGINE=InnoDB;
@@ -44,6 +47,10 @@ CREATE TABLE IF NOT EXISTS lecturas_diarias (
   horas_sol           DECIMAL(4,1)    NULL,   -- horas (sol)
   pres_max            DECIMAL(5,1)    NULL,   -- hPa (presMax)
   pres_min            DECIMAL(5,1)    NULL,   -- hPa (presMin)
+  dir_viento          TINYINT UNSIGNED NULL,  -- decenas de grado, 0-36 (dir); 99 = dirección variable
+  hum_media           TINYINT UNSIGNED NULL,  -- % humedad relativa media (hrMedia)
+  hum_max             TINYINT UNSIGNED NULL,  -- % humedad relativa máxima (hrMax)
+  hum_min             TINYINT UNSIGNED NULL,  -- % humedad relativa mínima (hrMin)
   PRIMARY KEY (id_lectura),
   -- Una sola lectura por ciudad y día: permite relanzar el script sin duplicar
   UNIQUE KEY uq_lectura_ciudad_fecha (id_ciudad, fecha),

@@ -6,7 +6,7 @@ function parseNum(val) {
 }
 
 // Transforma una lectura cruda de AEMET al objeto que espera el INSERT.
-// Los nombres de campo (tmax, tmin, tmed...) se verificarán con la respuesta real.
+// Nombres de campo verificados contra respuestas reales de la API (valores como texto, coma decimal).
 function parseLectura(raw) {
   const esInapreciable = raw.prec === 'Ip';
 
@@ -22,7 +22,11 @@ function parseLectura(raw) {
     horas_sol:           parseNum(raw.sol),
     pres_max:            parseNum(raw.presMax),
     pres_min:            parseNum(raw.presMin),
+    dir_viento:          parseNum(raw.dir),
+    hum_media:           parseNum(raw.hrMedia),
+    hum_max:             parseNum(raw.hrMax),
+    hum_min:             parseNum(raw.hrMin),
   };
 }
 
-module.exports = { parseLectura };
+module.exports = { parseLectura, parseNum };
