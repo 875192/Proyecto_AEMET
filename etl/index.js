@@ -1,6 +1,7 @@
 // Author: Jaime Fano Alijarde
 // Descripcion: 
-require('dotenv').config();
+// El .env está en la raíz del repositorio (lo comparten docker-compose y el ETL)
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 
 const pool             = require('./src/pool');
 const { ejecutarETL }  = require('./src/etl');
