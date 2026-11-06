@@ -71,3 +71,32 @@ INSERT INTO ciudades (nombre, indicativo) VALUES
   ('Zaragoza',  '9434'),
   ('Teruel',    '8368U')
 ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
+
+-- =====================================================================
+-- Proyecto Climate Change Analyzer (aplicación web)
+-- Tabla de usuarios. Los tipos de usuario del ERS son: usuario (sin
+-- registrar, no se guarda), usuario registrado y administrador (columna rol).
+-- Las contraseñas se guardan con hash (password_hash de PHP), nunca en claro.
+-- La edad (RQ15) se calcula a partir de fecha_nacimiento.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS usuarios (
+  id_usuario       INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  nick             VARCHAR(50)   NOT NULL,   -- nombre de usuario, único en el sistema
+  password_hash    VARCHAR(255)  NOT NULL,   -- hash bcrypt generado con password_hash()
+  nombre           VARCHAR(100)  NOT NULL,
+  apellidos        VARCHAR(150)  NOT NULL,
+  fecha_nacimiento DATE          NOT NULL,
+  telefono         VARCHAR(20)   NOT NULL,
+  email            VARCHAR(255)  NOT NULL,
+  rol              ENUM('registrado','administrador') NOT NULL DEFAULT 'registrado',
+  fecha_alta       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id_usuario),
+  UNIQUE KEY uq_usuarios_nick (nick)
+) ENGINE=InnoDB;
+
+-- Administrador por defecto (RQ11): usuario "pepe" y contraseña "pepe".
+-- El hash corresponde a la contraseña "pepe" (bcrypt, generado con password_hash).
+INSERT INTO usuarios (nick, password_hash, nombre, apellidos, fecha_nacimiento, telefono, email, rol)
+VALUES ('pepe', '$2y$10$E19.dn/mBuh33kqVWvnoGer8f8FnaMi.4ZWC0voLQcYPBQxv.8Eye',
+        'Pepe', 'Administrador', '2000-01-01', '000000000', 'admin@cca.local', 'administrador')
+ON DUPLICATE KEY UPDATE nick = nick;
