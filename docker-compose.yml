@@ -1,4 +1,4 @@
-# MySQL + phpMyAdmin para la práctica AEMET.
+# MySQL + phpMyAdmin + aplicación web para la práctica AEMET / proyecto Climate Change Analyzer.
 # Uso:  docker compose up -d
 # Author: Jaime Fano Alijarde
 # Requiere un archivo .env (copia .env.example y ajusta las contraseñas).
@@ -36,6 +36,44 @@ services:
       PMA_HOST: db
     ports:
       - "8080:80"
+
+  # Aplicación web (PHP + Apache). Sirve web/public en http://localhost:8000
+  web:
+    build: ./web
+    container_name: cca_web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db            # dentro de la red de Docker, la base de datos es "db"
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "8000:80"
+    volumes:
+      - ./web:/var/www/html
+
+  # ETL (Node.js): descarga datos de AEMET y los guarda en MySQL.
+  # Se queda en ejecución: actualiza al arrancar y después cada día a las HORA_ACTUALIZACION
+  # (00:30 por defecto). La primera vez, con la base de datos vacía, carga el histórico completo.
+  # Uso manual, además:
+  #   docker compose run --rm etl node index.js          (histórico completo)
+  #   docker compose run --rm etl npm run actualizar     (continuar desde la última lectura)
+  etl:
+    build: ./etl
+    container_name: cca_etl
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env          # AEMET_API_KEY, HORA_ACTUALIZACION, HISTORICO_ANIOS, etc.
+    environment:
+      DB_HOST: db           # dentro de la red de Docker, la base de datos es "db"
+      DB_PORT: 3306
+      TZ: Europe/Madrid
 
 volumes:
   mysql_data:

@@ -1,6 +1,6 @@
 # Proyecto AEMET — Extracción de datos meteorológicos a MySQL
 
-**Autor:** Jaime Fano Alijarde ([jaimefano10@gmail.com](mailto:875192@unizar.es)) — Universidad de Zaragoza  
+**Autor:** Jaime Fano Alijarde ([jaimeefano@gmail.com](mailto:jaimeefano@gmail.com)) — Universidad de Zaragoza  
 **Fecha de creación:** Octubre 2026  
 **Asignatura:** Sistemas de Información · Práctica de investigación 
 
@@ -31,13 +31,15 @@ Temperatura máxima, mínima y media · Precipitación · Velocidad media, racha
 ## Estructura del repositorio
 
 ```
-├── docker-compose.yml       # MySQL 8.4 + phpMyAdmin en Docker
+├── docker-compose.yml       # MySQL 8.4, phpMyAdmin, web y ETL (diario) en Docker
 ├── .env.example             # Variables de entorno necesarias (copiar a .env y ajustar)
 ├── database/
 │   ├── schema.sql           # Esquema de la base de datos (tablas ciudades + lecturas_diarias)
 │   └── datos_aemet.sql      # Volcado completo (estructura + datos ya cargados) para importar tal cual
 ├── etl/                     # Carga de datos (Node.js)
+│   ├── Dockerfile           # Imagen del ETL
 │   ├── index.js             # Punto de entrada: carga .env, define rango de fechas y arranca el ETL
+│   ├── scheduler.js         # Programador: lanza el ETL al arrancar y cada día a la hora configurada
 │   ├── package.json         # Dependencias Node.js (mysql2, dotenv)
 │   └── src/
 │       ├── pool.js          # Pool de conexiones MySQL reutilizable
@@ -45,6 +47,9 @@ Temperatura máxima, mínima y media · Precipitación · Velocidad media, racha
 │       ├── parser.js        # Transforma la respuesta cruda de AEMET al formato del schema
 │       └── etl.js           # Orquesta la extracción, transformación e inserción de datos
 ├── web/                     # Aplicación web en PHP (proyecto Climate Change Analyzer)
+│   ├── Dockerfile           # Apache + PHP 8.3 con PDO MySQL
+│   ├── public/              # Raíz del servidor web (index.php, assets)
+│   └── app/                 # config, helpers, models, controllers, views
 └── docs/
     └── practica-investigacion/   # Enunciado y notas de la práctica de investigación
 ```
@@ -59,7 +64,7 @@ Temperatura máxima, mínima y media · Precipitación · Velocidad media, racha
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/875192/Proyecto_AEMET.git
+git clone https://github.com/jaimefano/Proyecto_AEMET.git
 cd Proyecto_AEMET
 
 # 2. Configurar variables de entorno
@@ -71,17 +76,43 @@ docker compose up -d
 # MySQL disponible en localhost:3306
 # phpMyAdmin disponible en http://localhost:8080
 
-# 4. Instalar dependencias y lanzar la extracción
+# 4. Lanzar la extracción
+#    Opción A: en Docker. El servicio "etl" arranca con "docker compose up" (paso 3), actualiza al
+#    arrancar y después cada día a las 00:30. Con la base de datos vacía, la primera vez carga el histórico.
+#    Opción B: directamente con Node.js
 cd etl
 npm install
 npm start        # equivale a: node index.js
 ```
 
-Por defecto se descargan los **últimos 30 días**. Para otro rango, define `FECHA_INI` y `FECHA_FIN` (`YYYY-MM-DD`) en el `.env`. El script se puede relanzar sin duplicar datos (`UNIQUE(id_ciudad, fecha)` + `ON DUPLICATE KEY UPDATE`).
+**Actualización automática.** El servicio `etl` se queda en ejecución: al arrancar y después cada día a las 00:30 (`HORA_ACTUALIZACION` en el `.env`, hora de Madrid) lanza `npm run actualizar`, que solo descarga desde la última lectura guardada. Se sigue el log con `docker compose logs -f etl`. Para lanzarlo a mano: `docker compose run --rm etl node index.js` (histórico completo) o `docker compose run --rm etl npm run actualizar`. Tras cambiar código del ETL, usa `docker compose up -d --build`.
+
+Por defecto se descarga el **histórico de los últimos 10 años** de cada ciudad (`HISTORICO_ANIOS`). Para otro rango, define `FECHA_INI` y `FECHA_FIN` (`YYYY-MM-DD`) en el `.env`.
+
+Como AEMET limita cada petición a 6 meses, el ETL divide el rango en tramos de 180 días y espera entre ellos. Si AEMET responde con el límite de peticiones (429), un error de servidor o la red falla, reintenta automáticamente; si un tramo sigue fallando, lo anota y continúa con el resto, y al terminar muestra un resumen de los tramos fallidos.
+
+El script se puede relanzar sin duplicar datos (`UNIQUE(id_ciudad, fecha)` + `ON DUPLICATE KEY UPDATE`). Para ponerte al día sin volver a descargarlo todo:
+
+```bash
+npm run actualizar   # continúa desde la última lectura guardada (con 7 días de solape)
+```
 
 > El archivo `database/schema.sql` se ejecuta automáticamente la primera vez que se crea el volumen.  
 > Para reiniciar desde cero: `docker compose down -v && docker compose up -d`  
 > Las variables `DB_*` del `.env` deben coincidir con las `MYSQL_*`. Si cambias una contraseña con la base ya creada, MySQL no la actualiza: recrea el volumen como indica arriba.
+
+## Aplicación web (proyecto Climate Change Analyzer)
+
+La carpeta `web/` contiene la aplicación en PHP (patrón MVC sin framework): `public/` es la raíz del servidor, y `app/` agrupa configuración, modelos, controladores, vistas y utilidades. Se ejecuta con Docker junto con la base de datos.
+
+Bootstrap 5.3.3 y Chart.js 4.4.3 están incluidos en `web/public/assets/vendor`, así que la web funciona sin conexión a internet y no hace falta instalar nada más.
+
+```bash
+docker compose up -d --build
+# Web disponible en http://localhost:8000
+```
+
+La página de inicio muestra, de momento, una comprobación de la conexión con la base de datos. El administrador por defecto es el usuario `pepe` (contraseña `pepe`), creado por `database/schema.sql`.
 
 ## Importar el volcado de datos (sin usar la API)
 
