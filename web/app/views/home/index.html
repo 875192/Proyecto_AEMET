@@ -1,0 +1,28 @@
+<h1 class="h3 mb-3">Inicio</h1>
+
+{{#si error}}
+  <div class="alert alert-danger" role="alert">{{error}}</div>
+{{/si}}
+{{#no error}}
+  <div class="alert alert-success" role="alert">
+    Conexión con la base de datos correcta: {{numCiudades}} ciudades y
+    {{lecturas}} lecturas diarias cargadas.
+  </div>
+
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr><th>Ciudad</th><th>Estación AEMET</th><th>Altitud (m)</th></tr>
+    </thead>
+    <tbody>
+      {{#cada ciudades}}
+        <tr>
+          <td>{{nombre}}</td>
+          <td>{{indicativo}}</td>
+          <td>{{altitud}}</td>
+        </tr>
+      {{/cada}}
+    </tbody>
+  </table>
+{{/no}}
+
+<p class="text-muted small">Página de comprobación temporal: se sustituirá por el inicio de sesión.</p>

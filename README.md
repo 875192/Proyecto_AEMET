@@ -49,7 +49,7 @@ Temperatura máxima, mínima y media · Precipitación · Velocidad media, racha
 ├── web/                     # Aplicación web en PHP (proyecto Climate Change Analyzer)
 │   ├── Dockerfile           # Apache + PHP 8.3 con PDO MySQL
 │   ├── public/              # Raíz del servidor web (index.php, assets)
-│   └── app/                 # config, helpers, models, controllers, views
+│   └── app/                 # config, helpers, models, controllers, views (.html sin PHP)
 └── docs/
     └── practica-investigacion/   # Enunciado y notas de la práctica de investigación
 ```

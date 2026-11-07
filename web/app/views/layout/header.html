@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= Vista::e($tituloPagina) ?></title>
+  <title>{{tituloPagina}}</title>
   <link rel="stylesheet" href="assets/vendor/bootstrap/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/estilos.css">
 </head>
@@ -13,13 +13,13 @@
 <header>
   <nav class="navbar navbar-expand navbar-dark bg-primary">
     <div class="container">
-      <a class="navbar-brand" href="index.php"><?= Vista::e(Config::get('app.nombre')) ?></a>
+      <a class="navbar-brand" href="index.php">{{nombreApp}}</a>
       <ul class="navbar-nav ms-auto align-items-center">
         <li class="nav-item"><a class="nav-link" href="index.php">Inicio</a></li>
-        <?php if (Sesion::estaIdentificado()): ?>
-          <li class="nav-item"><span class="navbar-text me-3"><?= Vista::e(Sesion::usuario()['nick']) ?></span></li>
+        {{#si usuario}}
+          <li class="nav-item"><span class="navbar-text me-3">{{usuario.nick}}</span></li>
           <li class="nav-item"><a class="nav-link" href="logout.php">Cerrar sesión</a></li>
-        <?php endif; ?>
+        {{/si}}
       </ul>
     </div>
   </nav>
@@ -27,6 +27,6 @@
 
 <!-- CUERPO -->
 <main class="container flex-grow-1 py-4">
-  <?php if (!empty($aviso)): ?>
-    <div class="alert alert-warning" role="alert"><?= Vista::e($aviso) ?></div>
-  <?php endif; ?>
+  {{#si aviso}}
+    <div class="alert alert-warning" role="alert">{{aviso}}</div>
+  {{/si}}
