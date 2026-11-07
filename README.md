@@ -34,7 +34,7 @@ Temperatura máxima, mínima y media · Precipitación · Velocidad media, racha
 ├── docker-compose.yml       # MySQL 8.4, phpMyAdmin, web y ETL (diario) en Docker
 ├── .env.example             # Variables de entorno necesarias (copiar a .env y ajustar)
 ├── database/
-│   ├── schema.sql           # Esquema de la base de datos (tablas ciudades + lecturas_diarias)
+│   ├── schema.sql           # Esquema de la base de datos (ciudades, lecturas_diarias y usuarios)
 │   └── datos_aemet.sql      # Volcado completo (estructura + datos ya cargados) para importar tal cual
 ├── etl/                     # Carga de datos (Node.js)
 │   ├── Dockerfile           # Imagen del ETL
@@ -45,7 +45,9 @@ Temperatura máxima, mínima y media · Precipitación · Velocidad media, racha
 │       ├── pool.js          # Pool de conexiones MySQL reutilizable
 │       ├── aemet.js         # Cliente HTTP para la API REST de AEMET OpenData
 │       ├── parser.js        # Transforma la respuesta cruda de AEMET al formato del schema
-│       └── etl.js           # Orquesta la extracción, transformación e inserción de datos
+│       ├── etl.js           # Orquesta la extracción, transformación e inserción de datos
+│       ├── rangos.js        # Divide el periodo en tramos que respetan el límite de AEMET
+│       └── programador.js   # Calcula la próxima ejecución diaria (lo usa scheduler.js)
 ├── web/                     # Aplicación web en PHP (proyecto Climate Change Analyzer)
 │   ├── Dockerfile           # Apache + PHP 8.3 con PDO MySQL
 │   ├── public/              # Raíz del servidor web (index.php, assets)
