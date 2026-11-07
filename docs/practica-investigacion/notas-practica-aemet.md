@@ -1,5 +1,7 @@
 # Práctica de investigación: AEMET → MySQL (notas de trabajo)
 
+> **Nota (proyecto Climate Change Analyzer):** estas son las notas de la práctica de investigación (fase 1). Algunas decisiones han cambiado después: el ETL ahora descarga un histórico de 10 años por tramos de 180 días (AEMET limita cada petición a 6 meses), reintenta ante fallos y se ejecuta cada día de forma automática; y los ficheros se han reorganizado en `etl/`, `database/` y `web/`.
+
 Última actualización: 2026-11-03
 
 ## Enunciado (resumen)
