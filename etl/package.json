@@ -4,7 +4,8 @@
   "description": "Extracción de datos meteorológicos AEMET a MySQL",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "actualizar": "node index.js --reanudar"
   },
   "author": "Jaime Fano Alijarde",
   "license": "ISC",
